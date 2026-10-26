@@ -16,7 +16,17 @@
   <em>Read → Import → Run → Inspect → Test → Explain</em>
 </p>
 
+<p align="center">
+  <a href="#-nhiệm-vụ-tuần-này">🎯 Mission</a> ·
+  <a href="#-hành-trình-thực-hành">🧭 Roadmap</a> ·
+  <a href="#-chạy-thử-trong-terminal">⚡ Quick start</a> ·
+  <a href="#-tài-liệu-cần-thiết">📚 Resources</a>
+</p>
+
 ---
+
+> [!TIP]
+> **Cách học hiệu quả:** chạy ví dụ trước, dự đoán output, rồi mới chạy test. Nếu kết quả khác dự đoán, hãy đọc lỗi và truy tìm nguyên nhân thay vì sửa ngẫu nhiên.
 
 ## 🚀 Nhiệm vụ tuần này
 
@@ -80,6 +90,13 @@ flowchart LR
 
 Đi lần lượt theo các chặng dưới đây. Nếu gặp khó, hãy thử tự làm trước rồi mới mở hints.
 
+| Chặng | Mục tiêu | Hoàn thành khi… |
+|---|---|---|
+| **01 · Discover** | Đọc khái niệm và cấu trúc | Bạn phân biệt được module, package và adapter |
+| **02 · Build** | Làm 3 exercise | Từng ví dụ chạy đúng |
+| **03 · Connect** | Đọc mini-project | Bạn mô tả được đường đi của dữ liệu |
+| **04 · Verify** | Chạy self-check | Màn hình báo `PASS` và bạn giải thích được vì sao |
+
 <details open>
   <summary><strong>🟢 Chặng 1 — Đọc bản đồ</strong></summary>
 
@@ -142,7 +159,13 @@ Dùng `python -m exercises.<module>` để chạy module trong ngữ cảnh pack
 
 ### 3. Chạy self-check
 
-Quay lại thư mục gốc repository, rồi chạy:
+Nếu bạn đang ở thư mục tuần, quay lại thư mục gốc repository trước: 
+
+```bash
+cd ../..
+```
+
+Sau đó chạy:
 
 ```bash
 python weeks/week-13-modules-cli-api/checks/check_week.py
@@ -207,11 +230,28 @@ Từ thư mục tuần, tạo virtual environment:
 python -m venv .venv
 ```
 
-Sau đó kích hoạt môi trường theo hệ điều hành của bạn và dùng `python -m pip` để cài thư viện vào đúng interpreter. Xem `pyproject.toml` và [Notes](notes.md) để biết dependency/tooling được khai báo. Chỉ cài nhóm dev khi bạn cần các công cụ phát triển tương ứng.
+Kích hoạt môi trường tùy terminal bạn đang dùng:
+
+```powershell
+# Windows PowerShell
+.\.venv\Scripts\Activate.ps1
+```
+
+```bash
+# macOS / Linux / Git Bash
+source .venv/bin/activate
+```
+
+Sau đó dùng `python -m pip` để cài thư viện vào đúng interpreter. Xem `pyproject.toml` và [Notes](notes.md) để biết dependency/tooling được khai báo. Chỉ cài nhóm dev khi bạn cần các công cụ phát triển tương ứng.
+
+> Nếu máy báo không tìm thấy `python`, thử `py` trên Windows. Khi làm việc trong VS Code, hãy chọn interpreter trùng với môi trường `.venv`.
 
 ---
 
 ## 📚 Tài liệu cần thiết
+
+> [!NOTE]
+> Các đường dẫn dưới đây là đường dẫn tương đối trong repository, nên bạn có thể mở trực tiếp từ trang GitHub hoặc khi làm việc trong VS Code.
 
 | Tài liệu | Dùng khi nào? |
 |---|---|
@@ -234,6 +274,13 @@ Không nhìn code, thử giải thích bằng lời của bạn:
 5. Vì sao Core không nên phụ thuộc vào CLI hoặc network?
 
 **Bạn đã qua màn khi:** chạy được chương trình, self-check thành công và giải thích được đường đi của dữ liệu.
+
+### ✅ Checklist trước khi đóng bài
+
+- [ ] Đã chạy ít nhất một exercise mà không nhìn lời giải.
+- [ ] Đã chạy self-check và đọc kết quả.
+- [ ] Đã giải thích được Core, Adapter, CLI và HTTP bằng lời của mình.
+- [ ] Đã ghi lại một lỗi từng gặp và cách mình tìm ra nguyên nhân.
 
 <p align="center">
   <strong>✨ Keep the core small. Make the boundaries clear. Prove it with tests. ✨</strong><br>
