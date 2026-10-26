@@ -1,75 +1,129 @@
-# Tuần 13 — Tách module, dựng CLI và hiểu HTTP
+# 🐸 Week 13 — Modules, CLI & HTTP
 
-> **Chủ đề riêng của tuần:** biến một đoạn code chạy được thành một chương trình có ranh giới rõ ràng — biết phần nào ra quyết định, phần nào nhận lệnh và phần nào giao tiếp với bên ngoài.
+<p align="center">
+  <strong>From one Python file to a small, well-organized program.</strong><br>
+  Tách trách nhiệm · Nhận lệnh từ terminal · Hiểu dữ liệu HTTP · Kiểm chứng bằng test
+</p>
 
-Tuần 13 nằm ở bước chuyển từ “viết được hàm Python” sang “biết tổ chức một chương trình nhỏ”. Ta sẽ đi theo hành trình của một bot học tập: **Core suy nghĩ → Adapter đóng gói kết quả → CLI nhận lệnh → HTTP giúp hiểu cách dữ liệu đi qua mạng**.
+<p align="center">
+  <img alt="Python" src="https://img.shields.io/badge/Python-3.12%2B-3776AB?style=for-the-badge&logo=python&logoColor=white">
+  <img alt="Level" src="https://img.shields.io/badge/Level-Beginner-16A34A?style=for-the-badge">
+  <img alt="Focus" src="https://img.shields.io/badge/Focus-Clean%20Boundaries-7C3AED?style=for-the-badge">
+  <img alt="Network" src="https://img.shields.io/badge/HTTP%20Examples-Offline-F59E0B?style=for-the-badge">
+</p>
 
-**Learning loop:** `Read → Import → Run → Inspect → Test → Explain`
+<p align="center">
+  <em>Read → Import → Run → Inspect → Test → Explain</em>
+</p>
 
 ---
 
-## 🐸 Câu chuyện của tuần: đừng để mọi thứ nằm trong một file
+## 🚀 Nhiệm vụ tuần này
 
-Hãy tưởng tượng bot là một đội nhỏ:
+Tuần 13 là bước chuyển từ **“viết được một hàm”** sang **“biết tổ chức một chương trình nhỏ”**. Ta theo chân một bot học tập để khám phá cách các phần phối hợp — mà không biến mọi thứ thành một file dài khó sửa.
 
-- **Bot Core** là người ra quyết định: nhận trạng thái, trả về hành động.
-- **Adapter** là phiên dịch: chuyển dữ liệu đầu vào thành lời gọi Core và định dạng kết quả.
-- **CLI** là quầy điều khiển: nhận tham số từ terminal bằng `argparse`.
-- **HTTP layer** là đường giao tiếp: tạo request, đọc status code và phân tích JSON response.
+<table>
+  <tr>
+    <td align="center" width="25%">
+      <h3>🧠 Core</h3>
+      Quyết định hành động
+    </td>
+    <td align="center" width="25%">
+      <h3>🔌 Adapter</h3>
+      Chuyển đổi dữ liệu
+    </td>
+    <td align="center" width="25%">
+      <h3>⌨️ CLI</h3>
+      Nhận lệnh từ bạn
+    </td>
+    <td align="center" width="25%">
+      <h3>🌐 HTTP</h3>
+      Hiểu request/response
+    </td>
+  </tr>
+</table>
 
-Mỗi phần có một trách nhiệm riêng. Nhờ vậy, thay đổi cách nhập lệnh không buộc ta viết lại logic quyết định; học HTTP cũng không có nghĩa là phải đưa network vào Core.
+### 🗺️ Nhìn nhanh kiến trúc
 
-```text
-Terminal arguments
-       │
-       ▼
-      CLI ───────► Adapter ───────► Bot Core
-                                      │
-                                      ▼
-                               action / decision
-
-HTTP lesson: request → response status → JSON parsing
-              (fixture offline, không gọi production API)
+```mermaid
+flowchart LR
+    U["⌨️ Terminal"] --> C["CLI · argparse"]
+    C --> A["🔌 Course Adapter"]
+    A --> B["🧠 Bot Core"]
+    B --> R["🎯 Action"]
+    H["🌐 HTTP fixture"] --> J["JSON + status check"]
+    J -. "bài học riêng" .-> A
+    classDef user fill:#dbeafe,stroke:#2563eb,color:#172554
+    classDef core fill:#dcfce7,stroke:#16a34a,color:#14532d
+    classDef edge fill:#f3e8ff,stroke:#9333ea,color:#581c87
+    class U,C user
+    class B,R core
+    class A,H,J edge
 ```
 
-## 🎯 Sau tuần này, bạn có thể
+> 💡 **Ý tưởng cốt lõi:** Core lo việc ra quyết định; CLI lo nhận lệnh; Adapter lo chuyển đổi dữ liệu. Khi mỗi phần có một nhiệm vụ rõ ràng, chương trình dễ hiểu, dễ test và dễ thay đổi hơn.
 
-- [ ] Import hàm từ module khác và giải thích vì sao cần `__init__.py`.
-- [ ] Dùng `if __name__ == "__main__":` để kiểm soát điểm bắt đầu chương trình.
-- [ ] Hiểu vai trò của virtual environment, `python -m pip` và `pyproject.toml`.
-- [ ] Khai báo tham số CLI bằng `argparse`, bao gồm kiểu dữ liệu và tham số bắt buộc.
-- [ ] Phân biệt HTTP method, status code, response body và JSON.
-- [ ] Nhận biết lỗi HTTP, JSON không hợp lệ và các rủi ro như timeout.
-- [ ] Giải thích được vì sao Bot Core nên độc lập với CLI và network.
-- [ ] Chạy self-check và dùng kết quả làm bằng chứng rằng các hành vi chính hoạt động.
+---
 
-## 🧭 Lộ trình thực hành
+## 🎯 Sau tuần này, bạn sẽ có thể
 
-Nên học theo thứ tự này; mỗi bước chuẩn bị kiến thức cho bước kế tiếp.
+- [ ] 📦 Import module và hiểu package, `__init__.py`.
+- [ ] 🚦 Dùng `if __name__ == "__main__":` để kiểm soát điểm bắt đầu.
+- [ ] 🧪 Hiểu vai trò của `venv`, `python -m pip` và `pyproject.toml`.
+- [ ] ⌨️ Tạo tham số CLI bằng `argparse`, đặt kiểu dữ liệu và yêu cầu bắt buộc.
+- [ ] 🌐 Nhận biết HTTP method, status code, response body và JSON.
+- [ ] 🛡️ Hiểu vì sao status thành công chưa chắc body hợp lệ.
+- [ ] 🧱 Giải thích vì sao Bot Core nên độc lập với CLI và network.
+- [ ] ✅ Chạy self-check để kiểm tra hành vi thay vì chỉ nhìn output.
 
-| Bước | Tệp / nội dung | Việc cần làm |
-|---|---|---|
-| 1 | [Notes](notes.md) | Đọc các khái niệm và sơ đồ luồng chương trình |
-| 2 | [Exercise 01](exercises/README.md) | Thực hành module, import và main guard |
-| 3 | [Exercise 02](exercises/README.md) | Thêm `--turn` bằng `argparse` |
-| 4 | [Exercise 03](exercises/README.md) | Phân tích JSON fixture và từ chối status lỗi |
-| 5 | [Hints](hints.md) | Chỉ mở khi đã tự thử và cần gợi ý |
-| 6 | [Mini-project](mini-project/README.md) | Theo luồng CLI → Adapter → Core |
-| 7 | Self-check | Chạy kiểm tra offline ở cuối trang |
+## 🧭 Hành trình thực hành
 
-## ▶️ Chạy thử
+Đi lần lượt theo các chặng dưới đây. Nếu gặp khó, hãy thử tự làm trước rồi mới mở hints.
 
-Các lệnh dưới đây chạy từ thư mục gốc repository.
+<details open>
+  <summary><strong>🟢 Chặng 1 — Đọc bản đồ</strong></summary>
 
-**1. Chạy CLI chính:**
+  Đọc [Notes](notes.md) để nắm module, package, CLI và HTTP. Chú ý ranh giới giữa Core và phần giao tiếp bên ngoài.
+</details>
+
+<details>
+  <summary><strong>🔵 Chặng 2 — Thử từng kỹ năng</strong></summary>
+
+  - [Exercises README](exercises/README.md)
+  - Exercise 01: import và main guard
+  - Exercise 02: thêm tham số `--turn`
+  - Exercise 03: parse JSON fixture và xử lý status lỗi
+</details>
+
+<details>
+  <summary><strong>🟣 Chặng 3 — Kết nối các phần</strong></summary>
+
+  Làm theo [Mini-project](mini-project/README.md): xem dữ liệu đi từ CLI qua Adapter đến Bot Core.
+</details>
+
+<details>
+  <summary><strong>🟠 Chặng 4 — Tự kiểm chứng</strong></summary>
+
+  Chạy self-check bên dưới. Nếu chưa qua, đọc lỗi đầu tiên, xác định phần gây lỗi rồi mới sửa.
+</details>
+
+---
+
+## ⚡ Chạy thử trong terminal
+
+> Các lệnh đầu tiên chạy từ **thư mục gốc repository**.
+
+### 1. Khởi động bot
 
 ```bash
 python weeks/week-13-modules-cli-api/cli.py --position 1 --goal 4
 ```
 
-Với ví dụ này, vị trí `1` nhỏ hơn mục tiêu `4`, nên Core chọn hành động `right`. Kết quả được in ra theo định dạng của course adapter; đây là định dạng phục vụ học tập, không phải giao thức production.
+Vì vị trí `1` nhỏ hơn mục tiêu `4`, Core chọn hành động `right`. Output được đóng gói theo định dạng course adapter để phục vụ bài học.
 
-**2. Chạy bài tập riêng lẻ** — chuyển vào thư mục tuần trước:
+### 2. Chạy ba exercise
+
+Chuyển vào thư mục tuần:
 
 ```bash
 cd weeks/week-13-modules-cli-api
@@ -78,82 +132,110 @@ python -m exercises.ex02_cli --turn 3
 python -m exercises.ex03_http
 ```
 
-Dùng `python -m exercises.<module>` giúp Python chạy bài tập theo ngữ cảnh package. Nếu chạy trực tiếp bằng đường dẫn file, việc tìm module cùng package có thể khác.
+Exercise 02 dự kiến in:
 
-**3. Chạy self-check offline** — quay lại thư mục gốc repository:
+```text
+Namespace(turn=3)
+```
+
+Dùng `python -m exercises.<module>` để chạy module trong ngữ cảnh package. Chạy file trực tiếp bằng đường dẫn có thể khiến cách Python tìm module khác đi.
+
+### 3. Chạy self-check
+
+Quay lại thư mục gốc repository, rồi chạy:
 
 ```bash
 python weeks/week-13-modules-cli-api/checks/check_week.py
 ```
 
-Kết quả mong đợi khi các kiểm tra đều qua:
+Khi các kiểm tra đều qua, kết quả mong đợi là:
 
 ```text
 Week 13 solution checks: PASS
 ```
 
-> Nếu một lệnh báo lỗi, hãy kiểm tra thư mục hiện tại trong terminal, phiên bản Python, tên file và cách gọi module trước khi cài thêm thư viện.
+<details>
+  <summary><strong>🧯 Nếu lệnh báo lỗi thì kiểm tra gì?</strong></summary>
 
-## 🔍 Ba điều cần quan sát, không chỉ nhìn output
+  1. Bạn đang ở đúng thư mục chưa?
+  2. Tên file và tên module đã gõ chính xác chưa?
+  3. Bạn đang dùng đúng Python interpreter không?
+  4. Bạn đã lưu file sau khi sửa chưa?
 
-### 1. Module và package
+  Hãy đọc dòng lỗi đầu tiên có ý nghĩa trước khi cài thêm thư viện.
+</details>
 
-Một file `.py` có thể là module; package gom các module liên quan. Import giúp tái sử dụng hành vi thay vì sao chép code. Main guard giúp tách việc **import** khỏi việc **chạy chương trình**.
+---
 
-### 2. CLI là lớp nhận lệnh
+## 🔬 Ba phát hiện quan trọng
 
-`argparse` biến chuỗi người dùng nhập trong terminal thành giá trị có tên và kiểu dữ liệu. CLI nên chuyển input tới hàm phù hợp, không ôm luôn logic nghiệp vụ.
+<table>
+  <tr>
+    <td width="33%">
+      <h3>📦 01 · Module</h3>
+      File Python có thể được import để tái sử dụng. Main guard phân biệt việc import với việc chạy chương trình.
+    </td>
+    <td width="33%">
+      <h3>⌨️ 02 · CLI</h3>
+      <code>argparse</code> biến tham số terminal thành giá trị có tên và kiểu dữ liệu. CLI không nên chứa toàn bộ logic nghiệp vụ.
+    </td>
+    <td width="33%">
+      <h3>🌐 03 · HTTP</h3>
+      Kiểm tra status và parse JSON là hai việc riêng. Body vẫn có thể sai dù status thuộc nhóm thành công.
+    </td>
+  </tr>
+</table>
 
-### 3. HTTP status tốt chưa chắc JSON tốt
+### 🧱 Ai chịu trách nhiệm việc gì?
 
-Một response có status thành công vẫn có thể chứa JSON sai định dạng hoặc dữ liệu không đúng kiểu mong đợi. Vì thế cần kiểm tra status và parse body riêng. Bài học dùng fixture tĩnh để bạn kiểm tra hành vi mà không phụ thuộc Internet.
+| Thành phần | Trách nhiệm | Không nên làm |
+|---|---|---|
+| **Bot Core** | Quyết định từ dữ liệu đầu vào | Đọc `sys.argv` hoặc tự gọi mạng |
+| **Adapter** | Chuyển đổi và đóng gói dữ liệu | Giả vờ là giao thức production đã xác minh |
+| **CLI** | Nhận tham số và gọi phần phù hợp | Nhét mọi logic quyết định vào CLI |
+| **HTTP foundation** | Minh họa request, status và JSON | Suy diễn endpoint thật từ dữ liệu mẫu |
 
-## 🧱 Ranh giới quan trọng của project
+> 🔒 **Ranh giới an toàn:** ví dụ HTTP của tuần này dùng fixture offline. Endpoint, authentication, schema và runtime contract của VuaCóc production **chưa được xác minh**; không suy đoán chúng từ bài học.
 
-```text
-Bot Core       = quyết định dựa trên dữ liệu đầu vào
-Adapter        = chuyển đổi / đóng gói dữ liệu
-CLI            = giao diện dòng lệnh
-HTTP foundation = kiến thức request/response và JSON
-```
+---
 
-- Core không nên đọc trực tiếp `sys.argv` hay tự gọi mạng.
-- Adapter trong tuần này là adapter phục vụ khóa học.
-- Ví dụ HTTP dùng dữ liệu mẫu offline.
-- Endpoint, authentication, schema và runtime contract của VuaCóc production **chưa được xác minh**; không suy đoán chúng từ fixture hoặc output của bài học.
+## 🧰 Môi trường Python
 
-Đây là chủ ý thiết kế: hiểu ranh giới trước khi kết nối hệ thống thật.
-
-## 🧰 Môi trường và dependency
-
-Tuần này giới thiệu virtual environment để cô lập thư viện cho từng project. Từ thư mục tuần, có thể tạo môi trường bằng:
+Từ thư mục tuần, tạo virtual environment:
 
 ```bash
 python -m venv .venv
 ```
 
-Kích hoạt môi trường theo hệ điều hành của bạn, rồi dùng `python -m pip` để cài package vào đúng interpreter. Xem `pyproject.toml` và [notes](notes.md) để hiểu dependency/tooling của tuần; chỉ cài nhóm dev khi bạn cần chạy các công cụ phát triển được khai báo ở đó.
-
-## 📚 Tài liệu tuần 13
-
-- [Notes — giải thích khái niệm](notes.md)
-- [Exercises — cách chạy bài tập](exercises/README.md)
-- [Hints — gợi ý khi bị mắc](hints.md)
-- [Bot Core package](bot_course/)
-- [Mini-project — Local Bot CLI and Adapter Boundary](mini-project/README.md)
-
-## ✅ Tự đánh giá trước khi sang tuần 14
-
-Bạn đã thực sự hiểu bài nếu có thể tự trả lời, không nhìn code:
-
-1. Điều gì khác nhau giữa module và package?
-2. Vì sao import một file không nên tự động chạy CLI?
-3. `type=int` trong `argparse` giúp ích gì?
-4. Vì sao cần kiểm tra status code trước khi tin response body?
-5. Vì sao Core không nên phụ thuộc vào CLI hoặc network?
-
-**Dấu hiệu hoàn thành:** không chỉ chạy được lệnh — bạn giải thích được đường đi của dữ liệu và chỉ ra trách nhiệm của từng lớp.
+Sau đó kích hoạt môi trường theo hệ điều hành của bạn và dùng `python -m pip` để cài thư viện vào đúng interpreter. Xem `pyproject.toml` và [Notes](notes.md) để biết dependency/tooling được khai báo. Chỉ cài nhóm dev khi bạn cần các công cụ phát triển tương ứng.
 
 ---
 
-*Python Journey · Tuần 13 — Keep the core small. Make the boundaries clear. Prove it with tests.*
+## 📚 Tài liệu cần thiết
+
+| Tài liệu | Dùng khi nào? |
+|---|---|
+| [📖 Notes](notes.md) | Muốn hiểu khái niệm |
+| [🧩 Exercises](exercises/README.md) | Muốn tự code từng phần |
+| [💡 Hints](hints.md) | Đã thử nhưng đang mắc |
+| [📦 Bot Core](bot_course/) | Muốn xem module trong package |
+| [🐸 Mini-project](mini-project/README.md) | Muốn xem các phần nối với nhau |
+
+---
+
+## 🏁 Boss fight — tự trả lời trước khi sang Week 14
+
+Không nhìn code, thử giải thích bằng lời của bạn:
+
+1. Module khác package ở điểm nào?
+2. Vì sao import một file không nên tự động chạy CLI?
+3. `type=int` trong `argparse` có tác dụng gì?
+4. Vì sao cần kiểm tra status code và JSON body riêng?
+5. Vì sao Core không nên phụ thuộc vào CLI hoặc network?
+
+**Bạn đã qua màn khi:** chạy được chương trình, self-check thành công và giải thích được đường đi của dữ liệu.
+
+<p align="center">
+  <strong>✨ Keep the core small. Make the boundaries clear. Prove it with tests. ✨</strong><br>
+  <sub>Python Journey · Week 13</sub>
+</p>
