@@ -1,0 +1,186 @@
+Câu 1.
+##a.
+n = int(input("Nhap gia tri 1<=n<=1500:"))
+while n<1 or n>1500:
+    n = int(input("Nhap gia tri 1<=n<=1500:"))
+
+##b.
+def DemChuSoLe(n):
+    dem = 0
+
+    while n != 0:
+        tam = n % 10
+
+        if tam % 2 != 0:
+            dem += 1
+
+        n //= 10
+
+    return dem
+
+
+print("So luong chu so le la:", DemChuSoLe(n))
+
+
+##c.
+
+def S(n):
+    s = 0
+
+    for i in range(1, n + 1):
+        s += 1 / (2 * i)
+
+    return s
+
+
+print("S =", S(n))
+Câu 2.
+#a.
+s = input("Nhap chuoi s: ")
+
+dem = 0
+
+for ky_tu in s:
+    if ky_tu.isupper():
+        dem += 1
+
+if dem == 0:
+    print("Chuoi khong co ky tu chu hoa.")
+else:
+    print("So ky tu chu hoa:", dem)
+
+#b.
+def DoiXung(s):
+    if s == s[::-1]:
+        print("Chuoi doi xung.")
+    else:
+        print("Chuoi khong doi xung.")
+
+
+DoiXung(s)
+
+#c.
+tong = 0
+
+for ky_tu in s:
+    if ky_tu.isdigit():
+        tong += int(ky_tu)
+
+print("Tong cac chu so trong chuoi:", tong)
+Câu 3.
+#a.
+danhsach = []
+
+while True:
+    x = int(input("Nhap danh sach: "))
+
+    if x == 0:
+        break
+
+    danhsach.append(x)
+
+
+print("Danh sach vua nhap:", danhsach)
+
+#b.
+tong = 0
+
+for i in danhsach:
+    if i > 0 and i % 2 == 0:
+        tong += i
+
+
+if tong != 0:
+    print("Tong cac so duong chan:", tong)
+else:
+    print("Khong co so duong chan trong danh sach.")
+
+#c.
+k = int(input("Nhap k: "))
+
+dem = 0
+
+for i in danhsach:
+    if i == k:
+        dem += 1
+
+
+if dem == 0:
+    print("Khong co phan tu", k, "trong danh sach")
+else:
+    print("So lan xuat hien cua", k, "la:", dem)
+Câu 4.
+#a.
+from datetime import datetime
+
+n = int(input("Nhap so luong sach (n>0): "))
+
+while n <= 0:
+    n = int(input("Nhap so luong sach (n>0): "))
+
+
+tudien = {}
+
+namhientai = datetime.now().year
+
+for i in range(n):
+    MaSoSach = input("Nhap ma so sach: ")
+    TenSach = input("Nhap ten sach: ")
+    TenTacGia = input("Nhap ten tac gia: ")
+    NhaXuatBan = input("Nhap nha xuat ban: ")
+
+    NamXuatBan = int(input("Nhap nam xuat ban: "))
+
+    while NamXuatBan > namhientai:
+        NamXuatBan = int(input(
+            f"Nam xuat ban khong hop le, vui long nhap nam <= {namhientai}: "
+        ))
+
+    tudien[MaSoSach] = [
+        TenSach,
+        TenTacGia,
+        NhaXuatBan,
+        NamXuatBan
+    ]
+
+print(tudien)
+
+#b.
+x = input("Nhap ma so sach can xoa: ")
+
+if x in tudien:
+    del tudien[x]
+    print(f"Cuon sach co ma so {x} da duoc xoa.")
+else:
+    print("Khong tim thay cuon sach can xoa.")
+
+print(tudien)
+Câu 5.
+#a.
+class DienThoai:
+
+    def __init__(self, MaMay, TenMay, HangSanXuat,
+                 DungLuongPin, GiaBan):
+
+        self.MaMay = MaMay
+        self.TenMay = TenMay
+        self.HangSanXuat = HangSanXuat
+        self.DungLuongPin = DungLuongPin
+        self.GiaBan = GiaBan
+
+
+    def thongtindienthoai(self):
+
+        print("Ma may:", self.MaMay)
+        print("Ten may:", self.TenMay)
+        print("Hang san xuat:", self.HangSanXuat)
+        print("Dung luong pin:", self.DungLuongPin)
+        print("Gia ban:", self.GiaBan)
+
+#b.
+DT1 = DienThoai("DT01","iPhone 15 Pro","Apple",3274,28990000)
+DT2 = DienThoai("DT02","Galaxy S24 Ultra","Samsung",5000,29990000)
+
+
+DT1.thongtindienthoai()
+DT2.thongtindienthoai()
